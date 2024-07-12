@@ -1,11 +1,24 @@
+import os
+import json
+from dotenv import load_dotenv
 import streamlit as st
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 # Configuración de la conexión con Google Sheets
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
-client = gspread.authorize(creds)
+
+# Cargar las variables de entorno desde el archivo .env
+load_dotenv()
+
+# Leer las credenciales desde la variable de entorno
+google_credentials = os.getenv('GOOGLE_CREDENTIALS')
+
+if google_credentials:
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(google_credentials), scope)
+    client = gspread.authorize(creds)
+else:
+    print("No se encontraron las credenciales de Google en las variables de entorno.")
 
 # Seleccionar la hoja de cálculo y la hoja específica
 spreadsheet = client.open("BD_DEMO_ETB")
